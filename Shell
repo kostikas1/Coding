@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <unistd.h>
+
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+
+static char* args[512];
+static char* lastc;
+pid_t pid;
+int command_pipe[2];
+
+#define READ  0
+#define WRITE 1
+
+static int command(int input, int first, int last, int file);
+
+// Function to clean up child processes
+static void cleanup(int n);
+
+// Function to process a command line
+static int process(char* cmd, int input, int first, int last, int file);
+
+// Shell main loop
+int main()
+{
+    while (1)
+    {
+        printf("My shell> ");
+        fflush(NULL);
+
+        if (!fgets(line, 1024, stdin))
+            return 0;
+
+        int input = 0;
+        int first = 1;
+        int file = 0;
+
+        char* cmd = line;
+        char* red = strchr(cmd, '>');
+
+        while (red != NULL)
+        {
+            file = 1;
+            *red = '\0';
+            input = process(cmd, input, first, 0, file);
+            cmd = red + 1;
+            red = strchr(cmd, '>');
+            first = 0;
+        }
+
+        char* next = strchr(cmd, '|');
+        while (next != NULL)
+        {
+            *next = '\0';
+            input = process(cmd, input, first, 0, file);
+            cmd = next + 1;
+            next = strchr(cmd, '|');
+            first = 0;
+        }
+        input = process(cmd, input, first, 1, file);
+        cleanup(n);
+        n = 0;
+    }
+    return 0;
+}
+
+// Function to split a command line into arguments
+static void split(char* cmd, int first);
+
+// Function to execute a command
+static int process(char* cmd, int input, int first, int last, int file);
+
+// Function to remove leading whitespaces
+static char* delspace(char* s);
