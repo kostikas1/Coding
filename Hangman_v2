@@ -1,0 +1,157 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define SIZE 100
+
+// Function prototype for the menu
+int menu();
+
+int main(int argc, char *argv[])
+{
+    int choice, size, i, j, keylen, lword[SIZE], nsize, length, num, sum, numa, tot[SIZE], sumt, temp, loss, ans, pos, rig, n;
+    char *nword[SIZE], *word[SIZE], *last[SIZE], a[SIZE], c[SIZE], alp, tmp, wordl[SIZE];
+
+    nsize = 0;
+    sum = 0;
+    sumt = 0;
+    numa = 0;
+    num = 0;
+    loss = 0;
+    rig = 0;
+    n = 25;
+    alp = 'a' - 1;
+    a[0] = 'a';
+
+    // Initialize arrays
+    for (i = 0; i < SIZE; i++)
+    {
+        lword[i] = 0;
+    }
+
+    for (i = 0; i < SIZE; i++)
+    {
+        tot[i] = 0;
+    }
+    for (i = 0; i < SIZE; i++)
+    {
+        wordl[i] = '_';
+    }
+
+    // Get user choice from the menu
+    choice = menu();
+
+    // Menu-driven game loop
+    while (choice != 0)
+    {
+        if (choice == 1)
+        {
+            printf("Number of words:  ");
+            scanf("%d", &size);
+            FILE *fp;
+            // Open the dictionary file in append mode
+            fp = fopen("dictionary.txt", "a+");
+
+            // Allow the user to input words and add them to the dictionary file
+            for (i = 0; i < size; i++)
+            {
+                printf("Write the word:  ");
+                scanf("%s", word);
+                keylen = strlen(word);
+                lword[nsize] = keylen;
+                word[size] = (char *)malloc(nsize * sizeof(char));
+                nword[size] = (char *)malloc(nsize * sizeof(char));
+
+                // Write the word to the dictionary file
+                fprintf(fp, "%s\n", word);
+                nword[nsize] = strdup(word);
+
+                nsize++;
+            }
+            fclose(fp);
+        }
+        if (choice == 2)
+        {
+            printf("What is the length of the word?\n");
+            scanf("%d", &length);
+
+            // Filter words based on the specified length
+            for (i = 0; i < nsize; i++)
+            {
+                if (lword[i] == length)
+                {
+                    num = i;
+                    sum++;
+                }
+            }
+
+            if (sum == 1)
+            {
+                printf("Is %s your word?\n1. yes\n2. no\n", nword[num]);
+                scanf("%d", &ans);
+                if (ans == 1)
+                {
+                    printf("Game Over\n");
+                    return 0;
+                }
+                if (ans == 2)
+                {
+                    loss = loss + 1;
+                }
+            }
+
+            // Collect letters from filtered words
+            for (i = 0; i < nsize; i++)
+            {
+                if (lword[i] == length)
+                {
+                    last[numa] = nword[i];
+                    numa++;
+                }
+            }
+
+            // Store letters in a single array
+            for (i = 0; i < numa; i++)
+            {
+                for (j = 0; j < length; j++)
+                {
+                    c[sumt] = last[i][j];
+                    sumt = sumt + 1;
+                }
+            }
+
+            // Count occurrences of each letter
+            for (i = 0; i < 26; i++)
+            {
+                alp = alp + 1;
+                a[i] = alp;
+            }
+
+            for (i = 0; i < sumt; i++)
+            {
+                for (j = 0; j < 26; j++)
+                {
+                    if (c[i] == a[j])
+                    {
+                        tot[j] = tot[j] + 1;
+                    }
+                }
+            }
+
+            // Sort letters based on occurrences
+            for (i = 0; i < 26; i++)
+            {
+                for (j = 0; j < 25; j++)
+                {
+                    if (tot[j] > tot[j + 1])
+                    {
+                        temp = tot[j + 1];
+                        tot[j + 1] = tot[j];
+                        tot[j] = temp;
+                        tmp = a[j + 1];
+                        a[j + 1] = a[j];
+                        a[j] = tmp;
+                    }
+                }
+            }
+
+            // Letter guessing loop
