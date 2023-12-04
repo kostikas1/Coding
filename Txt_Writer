@@ -1,0 +1,44 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class YesNo extends JFrame implements ActionListener {
+
+    // Buttons and TextFields
+    JButton b1 = new JButton(">");
+    JButton b2 = new JButton("<");
+    JTextField tf1 = new JTextField("eisai");
+    JTextField tf2 = new JTextField("noobas");
+
+    public YesNo() {
+        super("YesNo");
+
+        // Set up the JFrame
+        setSize(300, 300);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setVisible(true);
+
+        // Set layout to BorderLayout
+        setLayout(new BorderLayout());
+
+        // Add buttons and text fields to the JFrame
+        add(b1, BorderLayout.NORTH);
+        b1.addActionListener(this);
+        add(b2, BorderLayout.SOUTH);
+        b2.addActionListener(this);
+        add(tf1, BorderLayout.WEST);
+        add(tf2, BorderLayout.EAST);
+    }
+
+    // Action performed when a button is clicked
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == b1)
+            tf1.setText("TEXT 1"); // Set text in tf1 to "TEXT 1" when > button is clicked
+        if (e.getSource() == b2)
+            tf2.setText("TEXT 2"); // Set text in tf2 to "TEXT 2" when < button is clicked
+    }
+
+    public static void main(String[] args) {
+        YesNo ok = new YesNo();
+    }
+}
