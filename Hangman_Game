@@ -1,0 +1,207 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define SIZE 100
+
+// Function prototypes
+int menu();
+
+int main(int argc, char *argv[])
+{
+    // Variable declarations
+    int choice, size, length, i, oldsize, sum, sz, ar, string_len, j, ans, loss, tot[SIZE], sumt, newsize, rig, pos, temp, n;
+    char *wordarr[SIZE], *word[SIZE], c[SIZE], a[SIZE], alp, wordl[SIZE], tmp;
+
+    // Initialization
+    oldsize = 0;
+    sum = 0;
+    sumt = 0;
+    newsize = 0;
+    alp = 'a' - 1;
+    a[0] = 'a';
+    loss = 0;
+    rig = 0;
+    n = 25;
+
+    // Initialize arrays
+    for (i = 0; i < SIZE; i++)
+    {
+        tot[i] = 0;
+    }
+    for (i = 0; i < SIZE; i++)
+    {
+        wordl[i] = '_';
+    }
+
+    // Get user choice from the menu
+    choice = menu();
+
+    // Menu-driven game loop
+    while (choice != 0)
+    {
+        if (choice == 1)
+        {
+            // Dictionary build
+            printf("Write the number of words\n");
+            scanf("%d", &size);
+            printf("Write your words one by one\n");
+            for (i = 0; i < size; i++)
+            {
+                wordarr[oldsize] = (char *)malloc(size * sizeof(char));
+                scanf("%s", wordarr[oldsize]);
+                oldsize++;
+            }
+            printf("Dictionary:\n");
+            for (i = 0; i < oldsize; i++)
+            {
+                printf("%s\n", wordarr[i]);
+            }
+            for (i = newsize; i < oldsize; i++)
+            {
+                string_len = strlen(wordarr[i]);
+                for (j = 0; j < string_len; j++)
+                {
+                    c[sumt] = wordarr[i][j];
+                    sumt = sumt + 1;
+                }
+            }
+            newsize = oldsize;
+        }
+        else if (choice == 2)
+        {
+            // Let's play
+            printf("What is the length of the word?\n");
+            scanf("%d", &length);
+
+            // Filtering words based on length
+            for (i = 0; i < oldsize; i++)
+            {
+                word[i] = (char *)malloc(size * sizeof(char));
+                sz = strlen(wordarr[i]);
+                if (length == sz)
+                {
+                    sum++;
+                    word[i] = wordarr[i];
+                    ar = i;
+                }
+            }
+
+            // Word guessing logic
+            if (sum == 1)
+            {
+                printf("Is %s your word?\n1. yes\n2. no\n", word[ar]);
+                scanf("%d", &ans);
+                if (ans == 1)
+                {
+                    printf("Game Over\n");
+                    return 0;
+                }
+                if (ans == 2)
+                {
+                    loss = loss + 1;
+                }
+            }
+
+            // Count occurrences of each letter in collected characters
+            for (i = 0; i < 26; i++)
+            {
+                alp = alp + 1;
+                a[i] = alp;
+            }
+
+            for (i = 0; i < sumt; i++)
+            {
+                for (j = 0; j < 26; j++)
+                {
+                    if (c[i] == a[j])
+                    {
+                        tot[j] = tot[j] + 1;
+                    }
+                }
+            }
+
+            // Sort letters based on occurrences
+            for (i = 0; i < 26; i++)
+            {
+                for (j = 0; j < 25; j++)
+                {
+                    if (tot[j] > tot[j + 1])
+                    {
+                        temp = tot[j + 1];
+                        tot[j + 1] = tot[j];
+                        tot[j] = temp;
+                        tmp = a[j + 1];
+                        a[j + 1] = a[j];
+                        a[j] = tmp;
+                    }
+                }
+            }
+
+            // Letter guessing loop
+            while (loss < 6 && rig < length)
+            {
+                printf("Is letter %c in the word?\n1. yes\n2. no\n", a[n]);
+                scanf("%d", &ans);
+                if (ans == 1)
+                {
+                    rig++;
+                    printf("In what position is the letter in the word?\n");
+                    scanf("%d", &pos);
+                    wordl[pos] = a[n];
+                    printf("The word until now:\t");
+                    for (i = 1; i <= length; i++)
+                    {
+                        printf("%c", wordl[i]);
+                    }
+                    printf("\n");
+                    printf("Is there another one?\n1. yes\n2. no\n");
+                    scanf("%d", &ans);
+                    while (ans == 1 && rig < length)
+                    {
+                        printf("In what position is the letter in the word?\n");
+                        scanf("%d", &pos);
+                        wordl[pos] = a[n];
+                        rig++;
+                        printf("The word until now:\t");
+                        for (i = 1; i <= length; i++)
+                        {
+                            printf("%c", wordl[i]);
+                        }
+                        printf("\n");
+                        if (rig < length)
+                        {
+                            printf("Is there another one?\n1. yes\n2. no\n");
+                            scanf("%d", &ans);
+                        }
+                    }
+                    tot[25] = 0;
+                }
+                else if (ans == 2)
+                {
+                    loss = loss + 1;
+                }
+                n = n - 1;
+            }
+
+            // Check game outcome
+            if (loss == 6)
+            {
+                printf("You have won. Congrats!!\n");
+                return 0;
+            }
+            if (rig == length)
+            {
+                printf("This is your word:\t");
+                for (i = 1; i <= length; i++)
+                {
+                    printf("%c", wordl[i]);
+                }
+                printf("\n");
+                return 0;
+            }
+        }
+
+        // Get user choice from the menu
+        choice = menu();
+    }
